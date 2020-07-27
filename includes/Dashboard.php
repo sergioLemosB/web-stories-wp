@@ -35,8 +35,8 @@ use WP_Screen;
  * Dashboard class.
  */
 class Dashboard {
-
 	use Assets;
+
 	/**
 	 * Script handle.
 	 *
@@ -50,6 +50,22 @@ class Dashboard {
 	 * @var string|false The dashboard page's hook_suffix, or false if the user does not have the capability required.
 	 */
 	private $hook_suffix;
+
+	/**
+	 * Experiments instance.
+	 *
+	 * @var Experiments Experiments instance.
+	 */
+	private $experiments;
+
+	/**
+	 * Dashboard constructor.
+	 *
+	 * @param Experiments $experiments Experiments instance.
+	 */
+	public function __construct( Experiments $experiments ) {
+		$this->experiments = $experiments;
+	}
 
 	/**
 	 * Initializes the dashboard logic.
@@ -253,43 +269,10 @@ class Dashboard {
 					'canUploadFiles'    => current_user_can( 'upload_files' ),
 				],
 			],
-			'flags'  => [
-				/**
-				 * Description: Enables user facing animations.
-				 * Author: @littlemilkstudio
-				 * Issue: 1897
-				 * Creation date: 2020-05-21
-				 */
-				'enableAnimation'                 => false,
-				/**
-				 * Description: Enables in-progress views to be accessed.
-				 * Author: @carlos-kelly
-				 * Issue: 2081
-				 * Creation date: 2020-05-28
-				 */
-				'enableInProgressViews'           => false,
-				/**
-				 * Description: Enables in-progress story actions.
-				 * Author: @brittanyirl
-				 * Issue: 2344
-				 * Creation date: 2020-06-10
-				 */
-				'enableInProgressStoryActions'    => false,
-				/**
-				 * Description: Enables in-progress template actions.
-				 * Author: @brittanyirl
-				 * Issue: 2381
-				 * Creation date: 2020-06-11
-				 */
-				'enableInProgressTemplateActions' => false,
-				/**
-				 * Description: Enables bookmark actions.
-				 * Author: @brittanyirl
-				 * Issue: 2292
-				 * Creation date: 2020-06-11
-				 */
-				'enableBookmarkActions'           => false,
-			],
+			'flags'  => array_merge(
+				$this->experiments->get_experiment_statuses( 'general' ),
+				$this->experiments->get_experiment_statuses( 'dashboard' )
+			),
 		];
 
 		/**
